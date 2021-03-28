@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS Track;
 
 CREATE TABLE Artist (
     id  INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-    name    TEXT UNIQUE #notice: the name is UNIQUE here
+    name    TEXT UNIQUE 
 );
 
 CREATE TABLE Album (
@@ -28,7 +28,7 @@ CREATE TABLE Track (
     album_id  INTEGER,
     len INTEGER, rating INTEGER, count INTEGER
 );
-''')
+''') #notice: the name is UNIQUE here
 
 
 fname = input('Enter file name: ')
