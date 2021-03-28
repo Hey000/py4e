@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS Track;
 
 CREATE TABLE Artist (
     id  INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-    name    TEXT UNIQUE
+    name    TEXT UNIQUE #notice: the name is UNIQUE here
 );
 
 CREATE TABLE Album (
@@ -37,16 +37,16 @@ if ( len(fname) < 1 ) : fname = 'Library.xml'
 # <key>Track ID</key><integer>369</integer>
 # <key>Name</key><string>Another One Bites The Dust</string>
 # <key>Artist</key><string>Queen</string>
-def lookup(d, key):
+def lookup(d, key): #https://www.w3resource.com/python-exercises/string/python-data-type-string-exercise-15.php
     found = False
     for child in d:
         if found : return child.text
-        if child.tag == 'key' and child.text == key :
+        if child.tag == 'key' and child.text == key : #tag is something inside <>
             found = True
     return None
 
-stuff = ET.parse(fname)
-all = stuff.findall('dict/dict/dict')
+stuff = ET.parse(fname) #parse() to find a certain string pattern: https://pypi.org/project/parse/; staff is an XML ET object:https://docs.python.org/3/library/xml.etree.elementtree.html
+all = stuff.findall('dict/dict/dict') #find the 3rd level dictionaries
 print('Dict count:', len(all))
 for entry in all:
     if ( lookup(entry, 'Track ID') is None ) : continue
@@ -63,9 +63,9 @@ for entry in all:
 
     print(name, artist, album, count, rating, length)
 
-    cur.execute('''INSERT OR IGNORE INTO Artist (name) 
+    cur.execute('''INSERT OR IGNORE INTO Artist (name)  
         VALUES ( ? )''', ( artist, ) )
-    cur.execute('SELECT id FROM Artist WHERE name = ? ', (artist, ))
+    cur.execute('SELECT id FROM Artist WHERE name = ? ', (artist, )) #IGNORE: because name of artist is UNIUQE, if you try to insert the same name twice, it will ignore(otherwise,it will blow up)
     artist_id = cur.fetchone()[0]
 
     cur.execute('''INSERT OR IGNORE INTO Album (title, artist_id) 
@@ -73,9 +73,10 @@ for entry in all:
     cur.execute('SELECT id FROM Album WHERE title = ? ', (album, ))
     album_id = cur.fetchone()[0]
 
-    cur.execute('''INSERT OR REPLACE INTO Track
+    cur.execute('''INSERT OR REPLACE INTO Track  
         (title, album_id, len, rating, count) 
         VALUES ( ?, ?, ?, ?, ? )''', 
-        ( name, album_id, length, rating, count ) )
+        ( name, album_id, length, rating, count ) ) #INSERT OR REPLACE: if the unique constraint would be violated, this turns into an update
 
     conn.commit()
+#INSERT OR REPLACE & INSERT OR IGNORE is not totally standard in SQL, it's just in SQLite
